@@ -23,7 +23,35 @@ class UniformCostSearch:
         reached[root.state] = root.cost
 
         # Initialize frontier with the root node
-        # TODO Complete the rest!!
-        # ...
-
+        frontier = PriorityQueueFrontier()
+        frontier.add(root, root.cost)
+ 
+        while not frontier.is_empty():
+            # Sacar de la frontera el nodo con menor costo de camino
+            node = frontier.pop()
+ 
+            # Aplicar el test objetivo al sacar el nodo de la frontera
+            if grid.objective_test(node.state):
+                return Solution(node, reached)
+ 
+            # Expandir el nodo
+            for action in grid.actions(node.state):
+                # Obtener el estado sucesor y su costo de camino
+                successor = grid.result(node.state, action)
+                new_cost = node.cost + grid.individual_cost(node.state, action)
+ 
+                # Conservar el sucesor si es nuevo o si se alcanzó con menor costo
+                if successor not in reached or new_cost < reached[successor]:
+                    son = Node(
+                        "",
+                        successor,
+                        cost=new_cost,
+                        parent=node,
+                        action=action,
+                    )
+ 
+                    # Actualizar el mejor costo conocido y agregar el hijo a la frontera
+                    reached[successor] = new_cost
+                    frontier.add(son, priority=new_cost)
+ 
         return NoSolution(reached)
